@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<robot name="bob">
+	<link name="base">
+		<inertial>
+	      <origin xyz="0 0 -.5" rpy="0 0 0" />
+	      <mass value="3" />
+	      <inertia ixx="1" ixy="0" ixz="0" iyy="0.083" iyz="0" izz="1" />
+	    </inertial>
+		<visual>
+			<geometry>
+				<box size="0.3 0.4 0.3"/>
+			</geometry>
+			<material name="blue">
+				<color rgba="0 0 1 1"/>
+			</material>
+		</visual>
+	</link>
+
+	<link name="rack">
+		<inertial>
+	      <origin xyz="0 0 -.5" rpy="0 0 0" />
+	      <mass value="3" />
+	      <inertia ixx="1" ixy="0" ixz="0" iyy="0.083" iyz="0" izz="1" />
+	    </inertial>
+		<visual>
+			<geometry>
+				<box size="0.05 0.3 0.05"/>
+			</geometry>
+			<material name="yellow">
+				<color rgba="1 1 0 1"/>
+			</material>
+		</visual>
+	</link>
+
+	<joint name="neck" type="revolute">
+		<parent link="base"/>
+		<child link="rack"/>
+		<origin xyz="0.075 0 0.1875" rpy="0 0 0"/>
+		<axis xyz="0 0 1"/>
+		<limit effort="0.9" lower="-1.57" upper="1.57" velocity="2000"/>
+	</joint>
+
+	<link name="left_fork">
+		<inertial>
+	      <origin xyz="0 0 -.5" rpy="0 0 0" />
+	      <mass value="3" />
+	      <inertia ixx="1" ixy="0" ixz="0" iyy="0.083" iyz="0" izz="1" />
+	    </inertial>
+		<visual>
+			<geometry>
+				<box size="0.5 0.025 0.025"/>
+			</geometry>
+			<material name="black">
+				<color rgba="0 0 0 1"/>
+			</material>
+		</visual>
+	</link>
+
+	<link name="right_fork">
+		<inertial>
+	      <origin xyz="0 0 -.5" rpy="0 0 0" />
+	      <mass value="3" />
+	      <inertia ixx="1" ixy="0" ixz="0" iyy="0.083" iyz="0" izz="1" />
+	    </inertial>
+		<visual>
+			<geometry>
+				<box size="0.5 0.025 0.025"/>
+			</geometry>
+			<material name="black">
+				<color rgba="0 0 0 1"/>
+			</material>
+		</visual>
+	</link>
+
+	<joint name="rack_to_left_fork" type="prismatic">
+		<parent link="rack"/>
+		<child link="left_fork"/>
+		<origin rpy="0 0 0" xyz="0.25 -0.15 0.025"/>
+		<axis xyz="0 1 0"/>
+		<limit lower="0.0" upper="0.13" effort="300" velocity="10"/>
+	</joint>
+
+	<joint name="rack_to_right_fork" type="prismatic">
+		<parent link="rack"/>
+		<child link="right_fork"/>
+		<origin rpy="0 0 0" xyz="0.25 0.15 0.025"/>
+		<axis xyz="0 1 0"/>
+		<limit lower="-0.13" upper="0.0" effort="300" velocity="10"/>
+	</joint>
+</robot>
