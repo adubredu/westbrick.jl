@@ -4,6 +4,7 @@ urdfpath() = joinpath(packagepath(), "models", "bob.urdf")
 left_joint = nothing 
 right_joint = nothing 
 neck_joint = nothing
+dimensions = SVector(0.3, 0.6, 0.3)
 
 
 function default_background!(mvis)
@@ -16,7 +17,7 @@ end
 
 
 function load_bob()
-    robot = RigidBodyDynamics.parse_urdf(urdfpath();floating=true) 
+    robot = RigidBodyDynamics.parse_urdf(urdfpath(); floating=true) 
     vis = Visualizer()
     mvis = MechanismVisualizer(robot, URDFVisuals(urdfpath(), package_path=[packagepath()]))  
     state = rbd.MechanismState(robot)

@@ -28,7 +28,21 @@ function rotate_gripper!(robot, state, mvis, angle)
     rbd.set_configuration!(mvis, rbd.configuration(state))
 end
 
+function rotate_bob!(robot, state, mvis, angle, position)
+    r = LinearMap(RotZ(angle))
+    rot = recenter(r, SVector(dimensions[1]/2.,dimensions[2]/2.,dimensions[3]/2.))
+    tf = compose(Translation(position[1],position[2],position[3]),rot) 
+    settransform!(mvis.visualizer["world/base"], tf)
+end
+
 
 function follow_trajectory!(robot, state, mvis, angle)
     settransform!(mvis.visualizer["base"], compose(Translation(0.0, 0.0, 0.0), LinearMap(RotZ(angle  ))))
 end
+
+# function rotate_in_place(vis, angle, position, dimensions)
+#     r = LinearMap(RotZ(angle))
+#     rot = recenter(r, SVector(dimensions[1]/2.,dimensions[2]/2.,dimensions[3]/2.))
+#     tf = compose(Translation(position[1],position[2],position[3]),rot) 
+#     settransform!(vis, tf)
+# end

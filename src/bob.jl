@@ -5,6 +5,7 @@ using MeshCatMechanisms
 using Colors
 using CoordinateTransformations
 using Rotations 
+using StaticArrays
 using RigidBodyDynamics
 
 rbd = MeshCatMechanisms.rbd 
@@ -15,6 +16,7 @@ include("control.jl")
 export load_bob,
        open_gripper!,
        close_gripper!,
-       follow_trajectory!
+       follow_trajectory!,
+       rotate_bob!
 
 end

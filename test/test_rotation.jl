@@ -8,11 +8,9 @@ using StaticArrays
 
 function rotate_in_place(vis, angle, position, dimensions)
     r = LinearMap(RotZ(angle))
-    ox = dimensions[1]/2. + position[1]
-    oy = dimensions[2]/2. + position[2]
-    oz = dimensions[3]/2. + position[3]
-    rot = recenter(r, SVector(ox, oy, oz))
-    settransform!(vis, rot)
+    rot = recenter(r, SVector(dimensions[1]/2.,dimensions[2]/2.,dimensions[3]/2.))
+    tf = compose(Translation(position[1],position[2],position[3]),rot) 
+    settransform!(vis, tf)
 end
 
 
@@ -24,7 +22,7 @@ box = HyperRectangle(Vec(0.,0.,0.), Vec(1., 1., 1.))
 setobject!(vis, box)
 
 
-position = SVector(2., 0., 0.)
+position = SVector(4., 3., 0.)
 settransform!(vis, Translation(position))
 
 rotate_in_place(vis, pi/4., position, dimensions)
