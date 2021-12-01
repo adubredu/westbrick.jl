@@ -8,6 +8,7 @@ MeshCat = "283c5d60-a78f-5afe-a0af-af636b173e11"
 MeshCatMechanisms = "6ad125db-dd91-5488-b820-c1df6aab299d"
 
 [compat]
+MeshCat = "0.14"
 julia = "1"
 
 [extras]
