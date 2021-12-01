@@ -8,7 +8,7 @@
 	    </inertial>
 		<visual>
 			<geometry>
-				<box size="0.3 0.4 0.3"/>
+				<box size="0.3 0.6 0.3"/>
 			</geometry>
 			<material name="blue">
 				<color rgba="0 0 1 1"/>
@@ -24,7 +24,7 @@
 	    </inertial>
 		<visual>
 			<geometry>
-				<box size="0.05 0.3 0.05"/>
+				<box size="0.05 0.5 0.05"/>
 			</geometry>
 			<material name="yellow">
 				<color rgba="1 1 0 1"/>
@@ -75,7 +75,7 @@
 	<joint name="rack_to_left_fork" type="prismatic">
 		<parent link="rack"/>
 		<child link="left_fork"/>
-		<origin rpy="0 0 0" xyz="0.25 -0.15 0.025"/>
+		<origin rpy="0 0 0" xyz="0.25 -0.25 0.025"/>
 		<axis xyz="0 1 0"/>
 		<limit lower="0.0" upper="0.13" effort="300" velocity="10"/>
 	</joint>
@@ -83,7 +83,7 @@
 	<joint name="rack_to_right_fork" type="prismatic">
 		<parent link="rack"/>
 		<child link="right_fork"/>
-		<origin rpy="0 0 0" xyz="0.25 0.15 0.025"/>
+		<origin rpy="0 0 0" xyz="0.25 0.25 0.025"/>
 		<axis xyz="0 1 0"/>
 		<limit lower="-0.13" upper="0.0" effort="300" velocity="10"/>
 	</joint>
