@@ -22,8 +22,11 @@ function load_bob()
     mvis = MechanismVisualizer(robot, URDFVisuals(urdfpath(), package_path=[packagepath()]))  
     state = rbd.MechanismState(robot)
     default_background!(mvis)
+    settransform!(vis["world/base"], Translation(0.0,0.0,0.15))
     settransform!(vis["/Cameras/default"],
-            compose(Translation(0.0, 0.0, 3.0), LinearMap(RotY(-pi/2.  )))) 
-    return robot, state, mvis 
+            compose(Translation(0.0, 0.0, 3.0), LinearMap(RotY(-pi  )))) 
+    bobby = Robot([0.,0.,0.], [0.,0.,0.], [0.,0.,0.], [0.,0.,0.], 0.01, 0.3,
+                 robot, mvis, state )
+    return bobby 
 end
 

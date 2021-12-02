@@ -22,10 +22,10 @@ box = HyperRectangle(Vec(0.,0.,0.), Vec(1., 1., 1.))
 setobject!(vis, box)
 
 
-position = SVector(4., 3., 0.)
+position = SVector(1., 0., 0.)
 settransform!(vis, Translation(position))
 
-rotate_in_place(vis, pi/4., position, dimensions)
+rotate_in_place(vis, pi/3, position, dimensions)
 
 
 

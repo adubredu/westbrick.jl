@@ -4,16 +4,19 @@ using MeshCat
 using StaticArrays
 using CoordinateTransformations
 
-robot, state, mvis = load_bob()
-render(mvis)
+bobby = load_bob()
+render(bobby.mvis)
 
-close_gripper!(robot, state, mvis)
-open_gripper!(robot, state, mvis)
+close_gripper!(bobby)
+open_gripper!(bobby)
 
-position = SVector(1., 0., 0.)
-settransform!(mvis.visualizer["world/base"], Translation(position))
-# settransform!(mvis.visualizer["world/rack"], Translation(position))
+position = SVector(0., 0., 0.)
+translate!(bobby, position)  
 
 
 # follow_trajectory!(robot, state, mvis, -pi)
-rotate_bob!(robot, state, mvis, pi, position)
+bobby.kp=0.01
+turn!(bobby, 0)
+
+position = SVector(2,2, 0.)
+go_to!(bobby, position)
