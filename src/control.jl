@@ -61,15 +61,19 @@ function rotate_bob!(bobby, Δθ)
 end
 
 function turn!(bobby, angle; tol=1e-2)
+    trans = [0.,0.,0.]
     while abs(norm(angle-bobby.orientation[3])) > tol 
         u = bobby.kp*(angle-bobby.orientation[3]) + bobby.kv*(bobby.angular_velocity[3])
-        trans = rotate_bob!(bobby, u)
+        t = rotate_bob!(bobby, u)
+        trans[1] = t[1]
+        trans[2] = t[2]
         println("turning ",bobby.orientation[3])
         sleep(0.01)
-        # if !isnothing(bobby.holding)
-        #     bobby.holding.position = trans 
-        # end
+        
     end
+    if !isnothing(bobby.holding)
+            bobby.holding.position = trans 
+        end
     println("done turning")
     
 
