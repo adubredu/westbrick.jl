@@ -26,7 +26,16 @@ function load_bob()
     settransform!(vis["/Cameras/default"],
             compose(Translation(0.0, 0.0, 3.0), LinearMap(RotY(-pi  )))) 
     bobby = Robot([0.,0.,0.], [0.,0.,0.], [0.,0.,0.], [0.,0.,0.], 0.01, 0.3,
-                 robot, mvis, state )
+                 robot, mvis, state, nothing)
     return bobby 
 end
 
+
+function create_object!(position, dimensions, id, bobby; geometry_type=:cube)
+    obj = HyperRectangle(Vec(-0.5,-0.5,0), Vec(dimensions...))
+    idstr = "world/"*string(id)
+    setobject!(bobby.mvis.visualizer[idstr], obj)
+    settransform!(bobby.mvis.visualizer[idstr], Translation(position))
+    object =  Object(idstr, obj, position, [0.,0.,0.], dimensions)
+    return object 
+end

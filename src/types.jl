@@ -8,4 +8,13 @@ mutable struct Robot
     mechanism 
     mvis 
     state 
+    holding
+end
+
+mutable struct Object 
+    id
+    body
+    position 
+    orientation 
+    dimensions 
 end
