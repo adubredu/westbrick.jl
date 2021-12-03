@@ -33,4 +33,4 @@ rot = LinearMap(RotZ(-pi/4.))
 rot = recenter(rot, [0.5, 0.5, 0.5])
 transrot = compose(rot, Translation(4.,5.,0))
 # settransform!(vis, rot)
-
+RotationVec(rot)

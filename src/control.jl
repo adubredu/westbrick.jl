@@ -39,9 +39,7 @@ end
 
 #rotation functions
 function rotate_bob!(bobby, Δθ)
-    angle = Δθ + bobby.orientation[3]
-    robot = bobby.mechanism 
-    state = bobby.state 
+    angle = Δθ + bobby.orientation[3] 
     mvis = bobby.mvis
     position = bobby.position
     r = LinearMap(RotZ(angle)) 
@@ -52,28 +50,28 @@ function rotate_bob!(bobby, Δθ)
         object = bobby.holding
         obj_angle = Δθ + object.orientation[3] 
         obj_position = object.position
-        obj_r = recenter(LinearMap(RotZ(angle)), position)
+        obj_r = recenter(LinearMap(RotZ(obj_angle)), position)
         obj_tf = compose(obj_r, Translation(obj_position[1],obj_position[2],obj_position[3]))
         settransform!(mvis.visualizer[object.id], obj_tf)
-        object.orientation = [0.,0.,obj_angle]
+        bobby.holding.orientation = [0.,0.,obj_angle]
         return obj_tf.translation
     end
 end
 
-function turn!(bobby, angle; tol=1e-2)
+function turn!(bobby, angle; tol=1e-2, final_angle = false)
     trans = [0.,0.,0.]
     while abs(norm(angle-bobby.orientation[3])) > tol 
         u = bobby.kp*(angle-bobby.orientation[3]) + bobby.kv*(bobby.angular_velocity[3])
         t = rotate_bob!(bobby, u)
         trans[1] = t[1]
         trans[2] = t[2]
-        println("turning ",bobby.orientation[3])
+        # println("turning ",bobby.orientation[3])
         sleep(0.01)
         
     end
-    if !isnothing(bobby.holding)
-            bobby.holding.position = trans 
-        end
+    if !isnothing(bobby.holding)#  && !final_angle
+        bobby.holding.position = trans 
+    end
     println("done turning")
     
 
@@ -92,28 +90,51 @@ function move_forward!(bobby, Δx)
         obj_position = Δx + object.position 
         obj_tf = compose(Translation(obj_position), LinearMap(RotZ(object.orientation[3])))
         settransform!(mvis.visualizer[object.id], obj_tf)
-        object.position = obj_position
+        bobby.holding.position = obj_position
+        return RotationVec(obj_tf.linear).sz, obj_tf.translation
     end
 
 end
 
 function translate!(bobby, position; tol=1e-2)
+    rot = [0.,0.,0.]
+    trans = [0.,0.,0.]
     while abs(norm(position-bobby.position)) > tol 
         u = bobby.kp*(position-bobby.position) + bobby.kv*(bobby.linear_velocity)
-        move_forward!(bobby, u)
-        println("translating ",bobby.position)
+        r,t = move_forward!(bobby, u)
+        rot[3]=r
+        trans[1] = t[1]
+        trans[2] = t[2]
+        # println("translating ",bobby.position)
         sleep(0.01)
     end
+    if !isnothing(bobby.holding) 
+        bobby.holding.orientation = rot 
+        # temp = trans[2]
+        # bobby.holding.position = [0.,0.,0.]
+        # bobby.holding.position[1] = trans[2]
+        # bobby.holding.position[2] = trans[1]
+    end
+    println("Trans pose ",trans)
     println("done translating")
+end
+
+function back_up!(bobby, δ)
+    Δx = δ*bobby.position
+    position = bobby.position - Δx
+    translate!(bobby,position) 
 end
 
 
 #motion functions
-function go_to!(bobby, position)
+function go_to!(bobby, position, θᵧ)
     angle = atan(position[2]-bobby.position[2], position[1]-bobby.position[1])
     turn!(bobby, angle)
     sleep(0.2)
     translate!(bobby, position)
+    sleep(0.2)
+    println("obj position ",bobby.holding.position)
+    turn!(bobby, θᵧ; final_angle=true)
 
 end
 
