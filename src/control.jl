@@ -1,151 +1,63 @@
-#gripper functions
-function close_gripper!(bobby) 
-    robot = bobby.mechanism 
-    state = bobby.state 
-    mvis = bobby.mvis
-    left_joint = rbd.findjoint(robot, "rack_to_left_fork")
-    right_joint = rbd.findjoint(robot, "rack_to_right_fork")  
-
-    rbd.set_configuration!(state, left_joint, 0.05)
-    rbd.set_configuration!(state, right_joint, -0.05)
-
-    rbd.set_configuration!(mvis, rbd.configuration(state))
-    
-end
-
-function open_gripper!(bobby) 
-    robot = bobby.mechanism 
-    state = bobby.state 
-    mvis = bobby.mvis
-    left_joint = rbd.findjoint(robot, "rack_to_left_fork")
-    right_joint = rbd.findjoint(robot, "rack_to_right_fork") 
- 
-    rbd.set_configuration!(state, left_joint, 0.0)
-    rbd.set_configuration!(state, right_joint, -0.0)
-
-    rbd.set_configuration!(mvis, rbd.configuration(state))
-    
-end
-
-function rotate_gripper!(bobby, angle)
-    robot = bobby.mechanism 
-    state = bobby.state 
-    mvis = bobby.mvis
-    neck_joint = rbd.findjoint(robot, "neck")
-    rbd.set_configuration!(state, neck_joint, angle)
-    rbd.set_configuration!(mvis, rbd.configuration(state))
-end
-
-
-#rotation functions
-function rotate_bob!(bobby, Δθ)
-    angle = Δθ + bobby.orientation[3] 
-    mvis = bobby.mvis
-    position = bobby.position
-    r = LinearMap(RotZ(angle)) 
-    tf = compose(Translation(position[1],position[2],position[3]),r) 
-    settransform!(mvis.visualizer["world/base"], tf)
-    bobby.orientation = [0.,0.,angle]
+function move_forward!(bobby, Δx, traj, obj_traj)
+    θ = bobby.pose[3]
+    x = Δx[1]*cos(θ)
+    y = Δx[2]*sin(θ)
+    pose = [bobby.pose[1]+x, bobby.pose[2]+y, θ] 
+    push!(traj, pose)
+    bobby.pose = pose
     if !isnothing(bobby.holding)
-        object = bobby.holding
-        obj_angle = Δθ + object.orientation[3] 
-        obj_position = object.position
-        obj_r = recenter(LinearMap(RotZ(obj_angle)), position)
-        obj_tf = compose(obj_r, Translation(obj_position[1],obj_position[2],obj_position[3]))
-        settransform!(mvis.visualizer[object.id], obj_tf)
-        bobby.holding.orientation = [0.,0.,obj_angle]
-        return obj_tf.translation
+        obpose = [bobby.holding.pose[1]+x, bobby.holding.pose[2]+y, θ]
+        bobby.holding.pose = obpose 
+        push!(obj_traj, obpose)
     end
 end
 
-function turn!(bobby, angle; tol=1e-2, final_angle = false)
-    trans = [0.,0.,0.]
-    while abs(norm(angle-bobby.orientation[3])) > tol 
-        u = bobby.kp*(angle-bobby.orientation[3]) + bobby.kv*(bobby.angular_velocity[3])
-        t = rotate_bob!(bobby, u)
-        trans[1] = t[1]
-        trans[2] = t[2]
-        # println("turning ",bobby.orientation[3])
-        sleep(0.01)
-        
+function translate!(bobby, pose, traj, obj_traj; tol=1e-2) 
+    while(abs(norm(pose[1:2]-bobby.pose[1:2])) > tol)
+        u = bobby.kp*abs.(pose[1:2]-bobby.pose[1:2]) + bobby.kv*(bobby.velocity[1:2])
+        move_forward!(bobby, u, traj, obj_traj)  
     end
-    if !isnothing(bobby.holding)#  && !final_angle
-        bobby.holding.position = trans 
-    end
-    println("done turning")
-    
-
+    return traj
 end
 
-
-#translation functions
-function move_forward!(bobby, Δx)
-    position = Δx + bobby.position
-    mvis = bobby.mvis
-    tf = compose(Translation(position), LinearMap(RotZ(bobby.orientation[3])))
-    settransform!(mvis.visualizer["world/base"], tf)
-    bobby.position = position
+function rotate!(bobby, Δθ, traj, obj_traj)
+    θ = bobby.pose[3] + Δθ
+    pose = [bobby.pose[1], bobby.pose[2], θ]
+    push!(traj, pose)
+    bobby.pose = pose
     if !isnothing(bobby.holding)
-        object = bobby.holding
-        obj_position = Δx + object.position 
-        obj_tf = compose(Translation(obj_position), LinearMap(RotZ(object.orientation[3])))
-        settransform!(mvis.visualizer[object.id], obj_tf)
-        bobby.holding.position = obj_position
-        return RotationVec(obj_tf.linear).sz, obj_tf.translation
+        R = [cos(θ) -sin(θ); 
+             sin(θ)  cos(θ)]
+        # oxy = [bobby.holding.pose[1]; bobby.holding.pose[2]]
+        # oxy = R*oxy 
+        # obpose = [oxy[1], oxy[2], θ]
+
+        Δxy = [0.6, 0.]
+        oxy = R*Δxy
+        obpose = [bobby.pose[1]+oxy[1], bobby.pose[2]+oxy[2], θ]
+
+        bobby.holding.pose = obpose 
+        push!(obj_traj, obpose)
     end
-
 end
 
-function translate!(bobby, position; tol=1e-2)
-    rot = [0.,0.,0.]
-    trans = [0.,0.,0.]
-    while abs(norm(position-bobby.position)) > tol 
-        u = bobby.kp*(position-bobby.position) + bobby.kv*(bobby.linear_velocity)
-        r,t = move_forward!(bobby, u)
-        rot[3]=r
-        trans[1] = t[1]
-        trans[2] = t[2]
-        # println("translating ",bobby.position)
-        sleep(0.01)
+
+function turn!(bobby, angle, traj, obj_traj; tol=1e-2) 
+    while(abs(norm(angle-bobby.pose[3])) > tol)
+        u = bobby.kp*(angle-bobby.pose[3]) + bobby.kv*(bobby.velocity[3])
+        rotate!(bobby, u, traj, obj_traj)
     end
-    if !isnothing(bobby.holding) 
-        bobby.holding.orientation = rot 
-        # temp = trans[2]
-        # bobby.holding.position = [0.,0.,0.]
-        # bobby.holding.position[1] = trans[2]
-        # bobby.holding.position[2] = trans[1]
-    end
-    println("Trans pose ",trans)
-    println("done translating")
+    return traj
 end
 
-function back_up!(bobby, δ)
-    Δx = δ*bobby.position
-    position = bobby.position - Δx
-    translate!(bobby,position) 
+function go_to!(bobby, pose)
+    traj, obj_traj = [], []
+    θ = atan(pose[2]-bobby.pose[2], pose[1]-bobby.pose[1])
+    println("rotating")
+    turn!(bobby, θ, traj, obj_traj)
+    println("translating")
+    translate!(bobby, pose, traj, obj_traj)
+    println("rotating")
+    turn!(bobby, pose[3], traj, obj_traj)
+    return traj, obj_traj
 end
-
-
-#motion functions
-function go_to!(bobby, position, θᵧ)
-    angle = atan(position[2]-bobby.position[2], position[1]-bobby.position[1])
-    turn!(bobby, angle)
-    sleep(0.2)
-    translate!(bobby, position)
-    sleep(0.2)
-    println("obj position ",bobby.holding.position)
-    turn!(bobby, θᵧ; final_angle=true)
-
-end
-
-
-function follow_trajectory!(robot, state, mvis, angle)
-    settransform!(mvis.visualizer["base"], compose(Translation(0.0, 0.0, 0.0), LinearMap(RotZ(angle  ))))
-end
-
-# function rotate_in_place(vis, angle, position, dimensions)
-#     r = LinearMap(RotZ(angle))
-#     rot = recenter(r, SVector(dimensions[1]/2.,dimensions[2]/2.,dimensions[3]/2.))
-#     tf = compose(Translation(position[1],position[2],position[3]),rot) 
-#     settransform!(vis, tf)
-# end

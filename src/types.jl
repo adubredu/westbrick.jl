@@ -1,20 +1,13 @@
 mutable struct Robot 
-    position
-    orientation
-    linear_velocity 
-    angular_velocity
+    pose 
+    velocity 
     kp
-    kv 
-    mechanism 
-    mvis 
-    state 
+    kv  
     holding
 end
 
 mutable struct Object 
-    id
-    body
-    position 
-    orientation 
+    id 
+    pose
     dimensions 
 end
