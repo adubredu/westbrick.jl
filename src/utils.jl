@@ -3,9 +3,17 @@ function load_robot()
     return robot
 end
 
-function load_object!(bobby, id)
-    dimensions = [0.4, 0.4]
-    pose = [0.6, 0., 0.]
+function load_object(pose, dimensions, id)
+    dimensions = [0.4, 0.4] 
     object = Object(id, pose, dimensions)
-    bobby.holding = object 
+    return object
+end
+
+function init_environment(num_objects, positions)
+    dimensions = [0.4, 0.4]
+    objects = []
+    for i=1:num_objects
+        push!(objects, load_object(positions[i][1:2], dimensions, i))
+    end
+    return objects 
 end
