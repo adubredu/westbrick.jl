@@ -5,7 +5,7 @@ end
 
 function load_object(pose, dimensions, id)
     dimensions = [0.4, 0.4] 
-    object = Object(id, pose, dimensions)
+    object = Object(id, pose, dimensions, :orange)
     return object
 end
 

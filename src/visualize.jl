@@ -12,7 +12,7 @@ function visualize_environment!(objects)
     for ob in objects 
         ox = Node(Point2f0(ob.pose...)) 
         θ = Node(0.0) 
-        scatter!(ax, ox; rotation=θ, marker=:rect, markersize=25)
+        scatter!(ax, ox; rotation=θ, marker=:rect, markersize=25, color=ob.color)
         obs_dict[ob.id] = (ox,θ)
     end
     return obs_dict

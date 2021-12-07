@@ -17,7 +17,7 @@ end
 function translate!(bobby, pose, traj, obj_traj; tol=1e-2) 
     while(abs(norm(pose[1:2]-bobby.pose[1:2])) > tol)
         u = bobby.kp*abs.(pose[1:2]-bobby.pose[1:2]) + bobby.kv*(bobby.velocity[1:2])
-        move_forward!(bobby, u, traj, obj_traj)  
+        move_forward!(bobby, u, traj, obj_traj)   
     end
     return traj
 end
@@ -50,12 +50,10 @@ function turn!(bobby, angle, traj, obj_traj; tol=1e-2)
     return traj
 end
 
+#RTR motion controller
 function go_to!(bobby, pose, traj, obj_traj) 
-    θ = atan(pose[2]-bobby.pose[2], pose[1]-bobby.pose[1])
-    println("rotating")
-    turn!(bobby, θ, traj, obj_traj)
-    println("translating")
-    translate!(bobby, pose, traj, obj_traj)
-    println("rotating")
+    θ = atan(pose[2]-bobby.pose[2], pose[1]-bobby.pose[1]) 
+    turn!(bobby, θ, traj, obj_traj) 
+    translate!(bobby, pose, traj, obj_traj) 
     turn!(bobby, pose[3], traj, obj_traj) 
 end
