@@ -10,7 +10,7 @@ function visualize_environment!(objects)
     ax = Axis(fig[1,1], aspect=DataAspect(), limits=(-10.,10.,-10.,10.))
     obs_dict = Dict()
     for ob in objects 
-        ox = Observable(Point2f(ob.pose...)) 
+        ox = Observable(SVector{2,Float64}(ob.pose...)) 
         θ = Observable(0.0) 
         scatter!(ax, ox; rotation=θ, marker=:rect, markersize=25, color=ob.color)
         obs_dict[ob.id] = (ox,θ)
@@ -23,20 +23,20 @@ function visualize_trajectory!(bobby, trajectory, obj_trajectory, obs_dict, ax, 
                                 name="media/test.gif")    
     T = length(trajectory) 
     θ = Observable(0.0)
-    x = Observable(Point2f(0.,0.))
+    x = Observable(SVector{2,Float64}(0.,0.))
     img = Observable(load("models/left_swing.png"))
     scatter!(ax, x; rotation=θ, marker=img, markersize=40)
     # hidedecorations!(ax) 
 
     function gaits!(t) 
         stride=10
-        x[] = Point2f(trajectory[t][1:2]...) 
+        x[] = SVector{2,Float64}(trajectory[t][1:2]...) 
         θ[] = trajectory[t][3] - π/2.
 
         if !isnothing(obj_trajectory[t])
             ind = obj_trajectory[t][4]
             ox, oθ = obs_dict[ind] 
-            ox[] = Point2f(obj_trajectory[t][1:2]...) 
+            ox[] = SVector{2,Float64}(obj_trajectory[t][1:2]...) 
             oθ[] = obj_trajectory[t][3] - π/2.
         end
         

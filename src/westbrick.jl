@@ -3,6 +3,7 @@ module westbrick
 using GLMakie
 using FileIO
 using LinearAlgebra
+using StaticArrays
 
 include("types.jl")
 include("utils.jl")
