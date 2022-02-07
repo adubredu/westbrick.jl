@@ -1,13 +1,12 @@
 using Revise
-using bob 
+using westbrick 
 
 num_objects = 13 
 positions = [[i,j] for (i,j) in zip(rand(3:8, num_objects),rand(-8:-3, num_objects))]
-place_pose = [[-2, 2, 0.],[-2, 3, 0.],[-2, 4, 0.], [-2, 5, 0.],[-2, 6, 0.],[-1, 5, 0.],
-              [0, 4, 0.],[1, 5, 0.],[2, 6, 0.],[2, 5, 0.],[2, 4, 0.],[2, 3, 0.],[2, 2, 0.]]
+place_pose = [[-2, 2, 0.],[-2, 3, 0.],[-2, 4, 0.], [-2, 5, 0.],[-2, 6, 0.],[-1, 5, 0.], [0, 4, 0.],[1, 5, 0.],[2, 6, 0.],[2, 5, 0.],[2, 4, 0.],[2, 3, 0.],[2, 2, 0.]]
 
 objects = init_environment(num_objects, positions)
-obs_dict = visualize_environment!(objects)
+obs_dict, ax, fig = visualize_environment!(objects)
 
 bobby = load_robot()
 traj, obj_traj = init_visualization()
@@ -23,8 +22,8 @@ end
  
 for i = 1:num_objects
     lay_block!(i)
-    println("laid block ",i)
+    # println("laid block ",i)
 end
 
 println("visualizing...")
-visualize_trajectory!(bobby, traj, obj_traj, obs_dict;name="media/build_M.mp4")
+visualize_trajectory!(bobby, traj, obj_traj, obs_dict, ax, fig;name="media/build_L.gif")
