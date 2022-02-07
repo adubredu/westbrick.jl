@@ -23,8 +23,10 @@ function visualize_trajectory!(bobby, trajectory, obj_trajectory, obs_dict, ax, 
                                 name="media/test.gif")    
     T = length(trajectory) 
     θ = Observable(0.0)
-    x = Observable(SVector{2,Float64}(0.,0.))
-    img = Observable(load("models/left_swing.png"))
+    x = Observable(SVector{2,Float64}(0.,0.)) 
+    left_img_bg_path = joinpath(@__DIR__, "..", "models/left_swing_bg.png")
+    right_img_bg_path = joinpath(@__DIR__, "..", "models/right_swing_bg.png")
+    img = Observable(load(left_img_bg_path))
     scatter!(ax, x; rotation=θ, marker=img, markersize=40)
     # hidedecorations!(ax) 
 
@@ -40,7 +42,7 @@ function visualize_trajectory!(bobby, trajectory, obj_trajectory, obs_dict, ax, 
             oθ[] = obj_trajectory[t][3] - π/2.
         end
         
-        img[] = t % (stride*2) <= stride ? load("models/left_swing_bg.png") : load("models/right_swing_bg.png")
+        img[] = t % (stride*2) <= stride ? load(left_img_bg_path) : load(right_img_bg_path)
         sleep(0.01)
     end
 
