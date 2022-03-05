@@ -1,19 +1,4 @@
-# westbrick.jl
-### A Julia Package for warehouse rearrangement mobile manipulation tasks.
-
-![](media/wesbrick_mid.jpg)
-
-## Installation
-1. Open your Julia REPL by typing  `julia` in your terminal.
-2. Press `]` on your keyboard to enter the package manager
-3. Enter command `add https://github.com/adubredu/westbrick.jl` and press 
-`Enter` on your keyboard to install this package.
-4. Press the `Backspace` key on your keyboard to return to the REPL
-
-## Usage
-Example usage scripts can be found in the [examples](examples) folder. The example script below builds a shape given a list of placement poses. 
-
-```julia
+using Revise
 using westbrick 
 
 # specifying number of packages
@@ -52,6 +37,3 @@ end
 # To save the simulation as a gif, specify a file name that ends in .gif. To save the simulation as a video, specify a file name that ends in .mp4
 println("visualizing...")
 visualize_trajectory!(bobby, traj, obj_traj, obs_dict, ax, fig;name="media/build_L.gif")
-```
-Here's the expected simulation results after running this script:  
-![](media/build_L.gif)
