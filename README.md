@@ -1,7 +1,7 @@
 # westbrick.jl
 ### A Julia Package for warehouse rearrangement mobile manipulation tasks.
 
-![](media/westbrick.jpg)
+![](media/westbrick_mid.jpg)
 
 ## Installation
 1. Open your Julia REPL by typing  `julia` in your terminal.
