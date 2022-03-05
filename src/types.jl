@@ -10,4 +10,5 @@ mutable struct Object
     id 
     pose
     dimensions 
+    color
 end
