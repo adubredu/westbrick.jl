@@ -1,4 +1,4 @@
-name = "bob"
+name = "westbrick"
 uuid = "0e4869b7-c236-41a1-945d-fd0e3bc5ead1"
 authors = ["Alphonsus Adu-Bredu"]
 version = "0.1.0"
@@ -6,16 +6,20 @@ version = "0.1.0"
 [deps]
 Colors = "5ae59095-9a9b-59fe-a467-6f913c188581"
 CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"
+FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
-MeshCat = "283c5d60-a78f-5afe-a0af-af636b173e11"
-MeshCatMechanisms = "6ad125db-dd91-5488-b820-c1df6aab299d"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
-RigidBodyDynamics = "366cf18f-59d5-5db9-a4de-86a9f6786172"
 Rotations = "6038ab10-8711-5258-84ad-4b1120ba62dc"
-StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182" 
 
 [compat]
-GeometryBasics = "0.4"
+GeometryBasics = "0.4"  
+CoordinateTransformations = "0.6" 
+StaticArrays = "1"  
+FileIO = "1" 
+GLMakie = "0.5"    
 julia = "1"
 
 [extras]
