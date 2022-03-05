@@ -1,29 +1,19 @@
-
-packagepath() = joinpath(@__DIR__,"..")
-urdfpath() = joinpath(packagepath(), "models", "bob.urdf")
-left_joint = nothing 
-right_joint = nothing 
-neck_joint = nothing
-dimensions = SVector(0.3, 0.6, 0.3)
-
-
-function default_background!(mvis)
-    vis = mvis.visualizer
-    setvisible!(vis["/Background"], true)
-    setprop!(vis["/Background"], "top_color", RGBA(1.0, 1.0, 1.0, 1.0))
-    setprop!(vis["/Background"], "bottom_color", RGBA(1.0, 1.0, 1.0, 1.0))
-    setvisible!(vis["/Axes"], false)
+function load_robot()
+    robot = Robot([0.,0.,0.], [0.,0.,0.], 0.1, 0.3, nothing)
+    return robot
 end
 
-
-function load_bob()
-    robot = RigidBodyDynamics.parse_urdf(urdfpath(); floating=true) 
-    vis = Visualizer()
-    mvis = MechanismVisualizer(robot, URDFVisuals(urdfpath(), package_path=[packagepath()]))  
-    state = rbd.MechanismState(robot)
-    default_background!(mvis)
-    settransform!(vis["/Cameras/default"],
-            compose(Translation(0.0, 0.0, 3.0), LinearMap(RotY(-pi/2.  )))) 
-    return robot, state, mvis 
+function load_object(pose, dimensions, id)
+    dimensions = [0.4, 0.4] 
+    object = Object(id, pose, dimensions, :orange)
+    return object
 end
 
+function init_environment(num_objects, positions)
+    dimensions = [0.4, 0.4]
+    objects = []
+    for i=1:num_objects
+        push!(objects, load_object(positions[i][1:2], dimensions, i))
+    end
+    return objects 
+end
