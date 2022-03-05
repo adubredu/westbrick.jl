@@ -53,5 +53,7 @@ end
 println("visualizing...")
 visualize_trajectory!(bobby, traj, obj_traj, obs_dict, ax, fig;name="media/build_L.gif")
 ```
+
 Here's the expected simulation results after running this script:  
+
 ![](media/build_L.gif)
