@@ -1,48 +1,59 @@
-function close_gripper!(robot, state, mvis) 
-    left_joint = rbd.findjoint(robot, "rack_to_left_fork")
-    right_joint = rbd.findjoint(robot, "rack_to_right_fork")  
+function move_forward!(bobby, Δx, traj, obj_traj)
+    θ = bobby.pose[3]
+    x = Δx[1]*cos(θ)
+    y = Δx[2]*sin(θ)
+    pose = [bobby.pose[1]+x, bobby.pose[2]+y, θ] 
+    push!(traj, pose)
+    bobby.pose = pose
+    if !isnothing(bobby.holding)
+        obpose = [bobby.holding.pose[1]+x, bobby.holding.pose[2]+y, θ]
+        bobby.holding.pose = obpose 
+        push!(obj_traj, [obpose...,bobby.holding.id])
+    else
+        push!(obj_traj, nothing)
+    end
+end
 
-    rbd.set_configuration!(state, left_joint, 0.05)
-    rbd.set_configuration!(state, right_joint, -0.05)
+function translate!(bobby, pose, traj, obj_traj; tol=1e-2) 
+    while(abs(norm(pose[1:2]-bobby.pose[1:2])) > tol)
+        u = bobby.kp*abs.(pose[1:2]-bobby.pose[1:2]) + bobby.kv*(bobby.velocity[1:2])
+        move_forward!(bobby, u, traj, obj_traj)   
+    end
+    return traj
+end
 
-    rbd.set_configuration!(mvis, rbd.configuration(state))
-    
+function rotate!(bobby, Δθ, traj, obj_traj)
+    θ = bobby.pose[3] + Δθ
+    pose = [bobby.pose[1], bobby.pose[2], θ]
+    push!(traj, pose)
+    bobby.pose = pose
+    if !isnothing(bobby.holding)
+        R = [cos(θ) -sin(θ); 
+             sin(θ)  cos(θ)] 
+        Δxy = [0.6, 0.]
+        oxy = R*Δxy
+        obpose = [bobby.pose[1]+oxy[1], bobby.pose[2]+oxy[2], θ]
+
+        bobby.holding.pose = obpose 
+        push!(obj_traj, [obpose...,bobby.holding.id])
+    else
+        push!(obj_traj, nothing)
+    end
 end
 
 
-function open_gripper!(robot, state, mvis) 
-    left_joint = rbd.findjoint(robot, "rack_to_left_fork")
-    right_joint = rbd.findjoint(robot, "rack_to_right_fork") 
- 
-    rbd.set_configuration!(state, left_joint, 0.0)
-    rbd.set_configuration!(state, right_joint, -0.0)
-
-    rbd.set_configuration!(mvis, rbd.configuration(state))
-    
+function turn!(bobby, angle, traj, obj_traj; tol=1e-2) 
+    while(abs(norm(angle-bobby.pose[3])) > tol)
+        u = bobby.kp*(angle-bobby.pose[3]) + bobby.kv*(bobby.velocity[3])
+        rotate!(bobby, u, traj, obj_traj)
+    end
+    return traj
 end
 
-
-function rotate_gripper!(robot, state, mvis, angle)
-    neck_joint = rbd.findjoint(robot, "neck")
-    rbd.set_configuration!(state, neck_joint, angle)
-    rbd.set_configuration!(mvis, rbd.configuration(state))
+#RTR motion controller
+function go_to!(bobby, pose, traj, obj_traj) 
+    θ = atan(pose[2]-bobby.pose[2], pose[1]-bobby.pose[1]) 
+    turn!(bobby, θ, traj, obj_traj) 
+    translate!(bobby, pose, traj, obj_traj) 
+    turn!(bobby, pose[3], traj, obj_traj) 
 end
-
-function rotate_bob!(robot, state, mvis, angle, position)
-    r = LinearMap(RotZ(angle))
-    rot = recenter(r, SVector(dimensions[1]/2.,dimensions[2]/2.,dimensions[3]/2.))
-    tf = compose(Translation(position[1],position[2],position[3]),rot) 
-    settransform!(mvis.visualizer["world/base"], tf)
-end
-
-
-function follow_trajectory!(robot, state, mvis, angle)
-    settransform!(mvis.visualizer["base"], compose(Translation(0.0, 0.0, 0.0), LinearMap(RotZ(angle  ))))
-end
-
-# function rotate_in_place(vis, angle, position, dimensions)
-#     r = LinearMap(RotZ(angle))
-#     rot = recenter(r, SVector(dimensions[1]/2.,dimensions[2]/2.,dimensions[3]/2.))
-#     tf = compose(Translation(position[1],position[2],position[3]),rot) 
-#     settransform!(vis, tf)
-# end
